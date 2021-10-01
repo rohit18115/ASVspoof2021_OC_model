@@ -125,25 +125,7 @@ class MVSoftmax(Model):
             else:
                 final_gt = cos_theta_m
                 # final_gt = torch.where(gt > cos_theta_m, cos_theta_m, gt)
-        # elif fc_type == 'RV-Arc':
-        #     sin_theta = torch.sqrt(1.0 - torch.pow(gt, 2))
-        #     cos_theta_m = gt * math.cos(margin) - sin_theta * math.sin(margin)  # cos(gt + margin)
-        #     # semi-hard vectors
-        #     mask1 = cos_theta >= cos_theta_m
-        #     mask2 = cos_theta <= gt
-        #     mask = mask1 & mask2
-        #     hard_vector = cos_theta[mask]
-        #     cos_theta[mask] = (t + 1.0) * hard_vector + t
-        #     final_gt = cos_theta_m
-        # elif fc_type == 'RV-AM':
-        #     # semi-hard vectors
-        #     mask1 = cos_theta >= gt - margin
-        #     mask2 = cos_theta <= gt 
-        #     mask = mask1 & mask2
-        #     hard_vector = cos_theta[mask]
-        #     cos_theta[mask] = (t + 1.0) * hard_vector + t
-        #     #cos_theta[mask] = hard_vector + t #fixed
-        #     final_gt = gt - margin
+       
         else:
             raise Exception('unknown fc type!')
 

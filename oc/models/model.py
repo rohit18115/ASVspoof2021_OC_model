@@ -29,7 +29,6 @@ import gc
 import torchaudio
 # import torchaudio.functional as F
 import torchaudio.transforms as T
-import torch_dct as dct
 
 
 
@@ -502,11 +501,7 @@ class OC_model(Model):
                 score_loader_oc.append(score_oc.detach())
 
 
-                # print("bidx: {}".format(bidx))
-                # print("--------------uttname : {}".format(uttname))
-                # print("--------------labels_oc : {}".format(labels_oc))
-                # print("--------------genh.size : {}, clean.size: {}".format(Genh.shape, \
-                # clean.shape))
+               
 #---------------------------------------------------------------------------
         scores_oc = torch.cat(score_loader_oc, 0).data.cpu().numpy()
         labels_oc = torch.cat(idx_loader_oc, 0).data.cpu().numpy()
@@ -514,90 +509,6 @@ class OC_model(Model):
         array_has_nan = np.isnan(array_sum)
         # print("--------------labels_oc : {}".format(labels_oc))
         # print("--------------uttname : {}".format(uttname))
-
-#--------------------------------------validation method according to the test_oc.py-------------
-            # idx_loader_oc, score_loader_oc = np.array([]), np.array([]) 
-            # spoof_genuine = {'spoof': 1, 'bonafide':0}
-            # for i in tqdm(range(len(protocol))):
-                
-            #     file_id = protocol.iloc[i, 4]
-            #     # print(file_id)
-            #     degradation_type = protocol.iloc[i,5]
-            #     name = protocol.iloc[i,1].split('/')[-1]
-                
-            #     [signal, fs] = sf.read(file_id)
-            #     signal = pre_emphasize(signal, opts.preemph)
-            #     # signal = normalize_wave_minmax(signal) #this line makes audio inaudioble but i think it is present in the dataloader so it might improve result of the model
-
-            #     beg_samp = 0
-            #     end_samp = opts.slice_size
-            #     wshift = int(opts.data_stride * opts.slice_size)
-            #     wlen = int(opts.slice_size)
-            #     # Batch_dev = args.batch_size
-            #     N_fr = max(math.ceil((signal.shape[0] - wlen) / (wshift)), 0)
-            #     # print("--------------N_fr:{}".format(N_fr+1))
-                
-            #     signal = torch.from_numpy(signal)
-            #     sig_arr = torch.zeros([N_fr + 1, wlen])
-            #     pout = torch.zeros(N_fr + 1)
-                
-            #     signal = signal.cuda().float().contiguous()
-            #     sig_arr = sig_arr.cuda().float().contiguous()
-            #     pout = pout.cuda().float().contiguous()
-            #     count_fr = 0
-            #     # print("Name: {} siganl.shape: {}".format(name,signal.shape))
-                
-            #     while end_samp < signal.shape[0]:
-            #         # print("------------beg_sample : {}, end_sample: {}".format(beg_samp,end_samp))
-            #         sig_arr[count_fr, :] = signal[beg_samp:end_samp]
-            #         beg_samp = beg_samp + wshift
-            #         end_samp = beg_samp + wlen
-            #         # print("------------beg_sample : {}, end_sample: {}".format(beg_samp,end_samp))
-            #         count_fr = count_fr + 1
-            #     if end_samp > signal.shape[0]:
-            #         # print("count_fr: {}".format(count_fr))
-            #         # print("sig_arr.shape:{}".format(sig_arr.shape))
-            #         # print("-------------Name: {} signal.shape: {}".format(name,signal.shape)) 
-            #         # print("-------------signal[beg_samp:signal.shape[0]].shape[0]:{}".format(signal[beg_samp:signal.shape[0]].shape[0]))
-            #         # print("----------------------(signal.shape[0]- beg_samp):{}".format((signal.shape[0] - beg_samp)))
-            #         # assert signal[beg_samp:signal.shape[0]].shape[0] == (signal.shape[0] - beg_samp), print("damn")
-            #         sig_arr[count_fr, :(signal.shape[0] - beg_samp)] = signal[beg_samp:signal.shape[0]]
-            #     # print("sig_arr.shape:{}".format(sig_arr.shape))
-                
-                    
-
-            #     if count_fr >= 0:
-            #         # j = j + 1
-            #         # # print(j)
-
-            #         inp = sig_arr
-            #         # print("------inp.size out", inp.shape)
-
-            #         feats, lfcc_outputs = self.OC(inp)
-                    
-            #         lab_batch = spoof_genuine[protocol.iloc[i, 3]]
-            #         labels = [lab_batch for s in range(feats.size(0))] 
-                    
-
-            #         score = F.softmax(lfcc_outputs)[:, 0]
-
-            #         if opts.add_loss_oc == "ocsoftmax":
-            #             ang_isoloss, score = self.OCS(feats, labels)
-            #         elif opts.add_loss_oc == "amsoftmax":
-            #             outputs, moutputs = self.AMS(feats, labels)
-            #             score = F.softmax(outputs, dim=1)[:, 0]
-            
-            #     pout[0:] = score
-            #     score_oc_oc = torch.sum((pout[:]), dim=0) / len(pout)
-            #     idx_loader_oc = np.append(idx_loader_oc ,lab_batch)
-            #     score_loader_oc = np.append(score_loader_oc ,score_oc_oc.cpu())
-            # scores_oc = score_loader_oc
-            # labels_oc = idx_loader_oc
-            # # scores_oc = torch.cat(score_loader_oc, 0).data.cpu().numpy()
-            # # labels_oc = torch.cat(idx_loader_oc, 0).data.cpu().numpy()
-            # array_sum = np.sum(scores_oc)
-            # array_has_nan = np.isnan(array_sum)
-#--------------------------------------------------------------------------------------
 
         val_eer_oc = em.compute_eer(scores_oc[labels_oc == 0], scores_oc[labels_oc == 1])[0]
         other_val_eer_oc = em.compute_eer(-scores_oc[labels_oc == 0], -scores_oc[labels_oc == 1])[0]
@@ -614,9 +525,7 @@ class OC_model(Model):
 
 
 
-#----------------------------------------------code copied from OC Classification model:------------------------------------------------
 
-#--------------------/media/rohit/NewVolume/codes/SA/PycharmProjects/ASVSpoof2021/AIR-ASVSpoof_LFCC_layer/LFCC_layer.py----------------
 
 ##################
 ## other utilities
@@ -717,134 +626,8 @@ def repeat_padding(spec, ref_len):
 
 
 
-#################
-## Spectrogram (FFT) front-end
-#################
 
 
-class MelSpec2DDCT(nn.Module):
-    """ Spectrogram front-end
-    """
-    def __init__(self, fl, fs, fn, sr, filter_num, feat_len, padding='repeat', 
-                 with_energy=True,
-                 with_emphasis=True, device = 'cuda'):
-        """ Initialize Spectrogram
-        
-        Para:
-        -----
-          fl: int, frame length, (number of waveform points)
-          fs: int, frame shift, (number of waveform points)
-          fn: int, FFT points
-          sr: int, sampling rate (Hz)
-          with_emphasis: bool, (default True), whether pre-emphaze input wav
-          with_delta: bool, (default False), whether use delta and delta-delta
-        
-        """
-        super(MelSpec2DDCT, self).__init__()
-        self.fl = fl
-        self.fs = fs
-        self.fn = fn
-        self.sr = sr
-        self.feat_len = feat_len
-        self.padding = padding
-        self.filter_num = filter_num
-        # opts
-        self.energy = {0:False, 1:True}
-        self.with_energy = with_energy
-        self.with_emphasis = with_emphasis
-        
-        self.spectrogram = T.MelSpectrogram(n_fft=self.fn,
-                                    sample_rate = self.sr,
-                                    win_length=self.fl,
-                                    hop_length=self.fs,
-                                    n_mels = 128,
-                                    normalized = True,
-                                    # mel_scale =  'htk',
-                                    # center=True,
-                                    # pad_mode="reflect",
-                                    power= self.energy[self.with_energy],
-        )
-        
-        self.melspec_dct = nii_dsp.LinearDCT(128 , 'dct', norm='ortho')
-
-        return
-    
-    def forward(self, x):
-        """
-        
-        input:
-        ------
-         x: tensor(batch, length), where length is waveform length
-        
-        output:
-        -------
-         lfcc_output: tensor(batch, frame_num, dim_num)
-        """
-        # pre-emphsis 
-        if self.with_emphasis:
-            x[:, 1:] = x[:, 1:]  - 0.97 * x[:, 0:-1]
-        spec = self.spectrogram(x)
-        print("spec.size():{}".format(spec.size()))
-        spec = spec.permute(0,2,1).contiguous()
-        sp_output = self.melspec_dct(spec)
-        print("sp_output.size(): {}".format(sp_output.size()))
-        
-        # # STFT
-        # x_stft = torch.stft(x, self.fn, self.fs, self.fl, 
-        #                     window=torch.hamming_window(self.fl).to(x.device), 
-        #                     onesided=True, pad_mode="constant")        
-        # # amplitude
-        # sp_amp = torch.norm(x_stft, 2, -1).pow(2).permute(0, 2, 1).contiguous()
-        # print("Before delta(Spectrogrma): {}".format(sp_amp.size()))
-        # # Add delta coefficients
-        # if self.with_delta:
-        #     sp_delta = delta(sp_amp)
-        #     sp_delta_delta = delta(sp_delta)
-        #     sp_output = torch.cat((sp_amp, sp_delta, sp_delta_delta), 2)
-        #     sp_output = sp_output.permute(0,2,1).contiguous()
-        #     this_feat_len = sp_output.shape[2]
-
-        #     if this_feat_len > self.feat_len:
-        #         startp = np.random.randint(this_feat_len-self.feat_len)
-        #         sp_output = sp_output[:,:, startp:startp+self.feat_len]
-        #     if this_feat_len < self.feat_len:
-        #         if self.padding == 'zero':
-        #         # print(type(feat_len))
-        #             sp_output = padding(sp_output, self.feat_len,self.device)
-        #         # print("-------------",lfcc_output.shape)
-        #         # print("new: {}".format(feat_mat.unsqueeze(0).shape))
-        #         elif self.padding == 'repeat':
-        #             sp_output = repeat_padding(sp_output, self.feat_len)
-        #         # print("new: {}".format(feat_mat.shape))
-        #         else:
-        #             raise ValueError('Padding should be zero or repeat!')
-
-        #     sp_output = sp_output.unsqueeze(1).float()
-
-        # else:
-        #     sp_output = sp_amp
-        #     sp_output = sp_output.permute(0,2,1).contiguous()
-        #     this_feat_len = sp_output.shape[2]
-
-        #     if(this_feat_len>self.feat_len):
-        #         startp = np.random.randint(this_feat_len-self.feat_len)
-        #         sp_output = sp_output[:,:, startp:startp+self.feat_len]                
-        #     if this_feat_len < self.feat_len:
-        #         if self.padding == 'zero':
-        #             # print(type(feat_len))
-        #             sp_output = padding(sp_output, self.feat_len,self.device)
-        #             # print("-------------",lfcc_output)
-        #             # print("new: {}".format(feat_mat.unsqueeze(0).shape)
-        #         if self.padding == 'repeat':
-        #             sp_output = repeat_padding(sp_output, self.feat_len)
-        #             # print("new: {}".format(feat_mat.shape))
-        #         else:
-        #             raise ValueError('Padding should be zero or repeat!')
-            
-        sp_output = sp_output.unsqueeze(1).float()
-                
-        # done
-        return sp_output
 
 #################
 ## MFCC front-end
@@ -1529,7 +1312,7 @@ class compile_model(Model):
         #     }
         self.frontend_LFCC = LFCC(self.batch_size,self.frame_length,self.frame_shift,self.fft_points,self.sr,self.filter_num,self.feat_len,self.pad_type, device = 'cuda')
         self.frontend_LFB = LFCC(self.batch_size,self.frame_length,self.frame_shift,self.fft_points,self.sr,self.filter_num,self.feat_len,self.pad_type,flag_for_LFB=True,device = 'cuda')#LFB(self.batch_size,self.frame_length,self.frame_shift,self.fft_points,self.sr,self.filter_num,self.feat_len,self.pad_type),
-        self.frontend_Spectrogram = MelSpec2DDCT(self.frame_length, self.frame_shift, self.fft_points, self.sr, self.filter_num, self.feat_len, self.pad_type, device = 'cuda')
+        # self.frontend_Spectrogram = MelSpec2DDCT(self.frame_length, self.frame_shift, self.fft_points, self.sr, self.filter_num, self.feat_len, self.pad_type, device = 'cuda')
         self.frontend_MFCC = MFCC(self.batch_size,self.frame_length, self.frame_shift, self.fft_points, self.sr, self.filter_num, self.feat_len, self.pad_type, device = 'cuda')
         self.frontend_Sincnet = SincConv_fast(60, 251, 16000, pading = self.pad_type)
         self.CMVN = T.SlidingWindowCmn(cmn_window = 600, norm_vars = True)
@@ -1584,25 +1367,11 @@ class compile_model(Model):
             x = self.frontend_Sincnet(x)
         elif self.frontend == 'LFB':
             x = self.frontend_LFB(x)
-        elif self.frontend == 'Spectrogram':
-            x = self.frontend_Spectrogram(x)
+        # elif self.frontend == 'Spectrogram':
+        #     x = self.frontend_Spectrogram(x)
         elif self.frontend == 'MFCC':
             x = self.frontend_MFCC(x)
-        # if (self.frontend == 'LFCC'):
-        #     print("Hiiiiiiiiiiii")
-        #     x = self.frontend_dict[self.frontend](x)
-        #     #   x = self.front_end_LFCC(x)
-        # elif (self.frontend == 'SincNet'):
-        #     x = x.unsqueeze(1)
-        #     # x = self.front_end_Sincnet(x)
-        #     x = self.frontend_dict[self.frontend](x)
-        # elif (self.frontend == 'MFCC'):
-        #     x = self.frontend_dict[self.frontend](x)
-        # elif (self.frontend == 'LFB'):
-        #     # print("Running LFB")
-        #     x = self.frontend_dict[self.frontend](x)
-        # elif(self.frontend == 'Spectrogram'):
-        #     x = self.frontend_dict[self.frontend](x)
+        
         if self.cmvn == True:
             x = self.CMVN(x)
         x = self.conv1(x)
