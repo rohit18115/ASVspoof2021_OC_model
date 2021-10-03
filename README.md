@@ -46,7 +46,7 @@ python pca_segan_style.py --oc_pretrained_ckpt ./weights/weights_OC-LFCC.ckpt --
 ```
 ## Other things that you might find useful in this repository:
 
-+ Building a custom coallate function to pad/slice the samples to max/min length just before feeding it to the model([link]{}).
++ Building a custom coallate function to pad/slice the samples to max/min length just before feeding it to the model([link](https://github.com/rohit18115/ASVspoof2021_OC_model/blob/main/pca_onesec.py)).
 + Building a custom batch sampler in pytorch to create custom mini-batches for training the model([link]{}).
 + Plot PCA/tSNE from learned embedding([]{}).
 
