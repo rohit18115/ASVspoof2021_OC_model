@@ -50,3 +50,6 @@ python pca_segan_style.py --oc_pretrained_ckpt ./weights/weights_OC-LFCC.ckpt --
 + Building a custom batch sampler in pytorch to create custom mini-batches for training the model([link](https://github.com/rohit18115/ASVspoof2021_OC_model/blob/888bbce1d80e728b2d851184924c955019f5108d/oc/datasets/se_dataset.py#L778)).
 + Plot PCA/tSNE from learned embedding([link](https://github.com/rohit18115/ASVspoof2021_OC_model/blob/main/pca.py)).
 
+## To-DO:
++ Add code for dataset modification.
+
